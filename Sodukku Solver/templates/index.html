@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sudoku Solver</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="logo-container">
+    <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+</div>
+<div class="background-effects"></div>
+
+<h1 class="title">🧩 Sudoku Solver</h1>
+
+<form method="POST" action="/home">
+    <div class="sudoku-grid">
+        {% for i in range(9) %}
+            {% for j in range(9) %}
+                <input 
+                    type="text"
+                    name="cell-{{i}}-{{j}}"
+                    maxlength="1"
+                    class="cell"
+                    value="{{ grid[i][j] if grid[i][j] != 0 else '' }}">
+            {% endfor %}
+        {% endfor %}
+    </div>
+<div class="logo-text">🧩 SUDOKU</div>
+    <button type="submit">Solve</button>
+    <a href="/clear" class="clear-btn">Clear</a>
+    <a href="/history" class="history-btn">History</a>
+</form>
+
+{% if error %}
+    <div class="error-box">
+        {{ error }}
+    </div>
+{% endif %}
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+
+{% if success %}
+<div class="success">{{ success }}</div>
+{% endif %}
+
+</body>
+</html>

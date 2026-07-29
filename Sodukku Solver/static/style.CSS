@@ -1,0 +1,981 @@
+/* ===== GLOBAL RESET ===== */
+* {
+    box-sizing: border-box;
+}
+
+/* ===== ANIMATED BACKGROUND ===== */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    text-align: center;
+    color: white;
+
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #00c6ff);
+    background-size: 400% 400%;
+    animation: bgMove 12s ease infinite;
+}
+
+@keyframes bgMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    /* LIGHT SOFT BACKGROUND */
+    background: linear-gradient(135deg, #f8fbff, #e6f7ff, #f1f5f9);
+
+    font-family: Arial, sans-serif;
+}
+/* ===== TITLE ===== */
+.title {
+    font-size: 45px;
+    margin-top: 20px;
+    letter-spacing: 2px;
+
+    text-shadow: 0 0 10px #fff, 0 0 20px #00e5ff;
+    animation: glowTitle 2s infinite alternate;
+}
+
+@keyframes glowTitle {
+    from { text-shadow: 0 0 10px #fff, 0 0 20px #00e5ff; }
+    to { text-shadow: 0 0 20px #00e5ff, 0 0 40px #fa1404; }
+}
+
+/* ===== GLASS CONTAINER ===== */
+form {
+    width: fit-content;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 20px;
+
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+
+    box-shadow: 
+        0 10px 40px rgba(0,0,0,0.4),
+        inset 0 0 20px rgba(255,255,255,0.1);
+
+    animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* ===== GRID ===== */
+.sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 60px);
+    gap: 6px;
+    justify-content: center;
+}
+
+/* ===== CELL BASE ===== */
+.cell {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 14px;
+    outline: none;
+    border: 1px solid #f66464;
+
+    color: #0d47a1;
+
+    background: linear-gradient(145deg, #ffffff, #e3f2fd);
+
+    transition: all 0.3s ease;
+
+    box-shadow: 
+        0 4px 10px rgba(0,0,0,0.2),
+        inset 0 1px 3px rgba(255,255,255,0.7);
+}
+
+/* ===== CELL HOVER ===== */
+.cell:hover {
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 
+        0 0 20px #ff0000,
+        0 0 30px rgba(0,198,255,0.5);
+}
+
+/* ===== CELL FOCUS ===== */
+.cell:focus {
+    transform: scale(1.15);
+    background: linear-gradient(145deg, #f68b64, #f38a21);
+    color: white;
+
+    box-shadow: 
+        0 0 20px #00ff1e,
+        0 0 40px #00ff44;
+}
+
+/* ===== TYPING ANIMATION ===== */
+.cell:not(:placeholder-shown) {
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.7); background: #c8e6c9; }
+    100% { transform: scale(1); }
+}
+
+/* ===== 3x3 BOX BORDERS ===== */
+.cell:nth-child(3n) {
+    border-right: 3px solid #ff0000;
+}
+.cell:nth-child(9n + 1) {
+    border-left: 3px solid #ff0000;
+}
+.cell:nth-child(-n + 9) {
+    border-top: 3px solid #00ff08;
+}
+.cell:nth-child(n + 73) {
+    border-bottom: 3px solid #00ff2f;
+}
+
+/* ===== BUTTONS ===== */
+button, .clear-btn {
+    padding: 12px 28px;
+    margin: 15px;
+    font-size: 18px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Solve Button */
+button {
+    background: linear-gradient(135deg, #00c853, #00e676);
+}
+
+/* Clear Button */
+.clear-btn {
+    background: linear-gradient(135deg, #ff1744, #ff5252);
+}
+
+/* BUTTON RIPPLE EFFECT */
+button::before, .clear-btn::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: 0.5s;
+}
+
+button:hover::before,
+.clear-btn:hover::before {
+    width: 250%;
+    height: 250%;
+}
+
+/* BUTTON HOVER */
+button:hover, .clear-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 20px rgba(0,255,200,0.7);
+}
+
+/* CLICK */
+button:active, .clear-btn:active {
+    transform: scale(0.95);
+}
+
+/* ===== ERROR POPUP ===== */
+.error-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-weight: bold;
+
+    background: linear-gradient(135deg, #ff1744, #d50000);
+    color: white;
+
+    box-shadow: 0 0 20px red;
+
+    animation: slideIn 0.5s ease, shake 0.4s;
+}
+
+/* Slide */
+@keyframes slideIn {
+    from { transform: translateX(200px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Shake */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-6px); }
+    100% { transform: translateX(0); }
+}
+
+/* ===== SUCCESS ANIMATION ===== */
+.cell[value]:not([value=""]) {
+    animation: successGlow 1s ease;
+}
+
+@keyframes successGlow {
+    0% { background: #c8e6c9; }
+    100% { background: linear-gradient(145deg, #ffffff, #e3f2fd); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .cell {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+    }
+
+    .title {
+        font-size: 28px;
+    }
+}
+/* HISTORY BUTTON - SAME STYLE AS OTHERS */
+.history-btn {
+    padding: 12px 28px;
+    margin: 10px;
+    font-size: 18px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    box-shadow: 0 5px 15px rgba(101, 67, 255, 0.5);
+
+    transition: all 0.3s ease;
+}
+
+/* Hover effect SAME as your buttons */
+.history-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Click effect */
+.history-btn:active {
+    transform: scale(0.95);
+}
+.sudoku-grid {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* MAKE EACH 9x9 GRID A SEPARATE BLOCK */
+.sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 60px);
+    gap: 10px;
+
+    margin: 40px auto;   /* 👈 space between each board */
+    width: fit-content;
+
+    padding: 20px;
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+
+    /* 🔥 Gradient background */
+    background: linear-gradient(135deg, #1e3c72, #2a5298, #6dd5ed);
+    
+    min-height: 100vh;
+}
+.sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 60px);
+    gap: 10px;
+
+    margin: 40px auto;
+    padding: 20px;
+
+    border-radius: 20px;
+
+    /* 🔥 Glassmorphism */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.cell {
+    width: 60px;
+    height: 60px;
+
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+
+    border: none;
+    border-radius: 12px;
+
+    background: rgba(255,255,255,0.9);
+    color: #1e3c72;
+
+    transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.cell:hover {
+    transform: scale(1.1);
+    background: #ffffff;
+}
+.title {
+    text-align: center;
+    color: white;
+    font-size: 36px;
+    margin-top: 20px;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.sudoku-grid {
+    animation: fadeUp 0.6s ease;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+
+    background: linear-gradient(-45deg, #1e3c72, #2a5298, #6dd5ed, #2193b0);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.cell {
+    width: 60px;
+    height: 60px;
+
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+
+    border-radius: 12px;
+    border: none;
+
+    background: rgba(255,255,255,0.9);
+    color: #1e3c72;
+
+    transition: all 0.3s ease;
+}
+
+/* Hover highlight */
+.cell:hover {
+    background: #00f2fe;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #00f2fe;
+}
+/* Wrap history page content */
+.history-container {
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Scrollbar styling */
+.history-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+    background: #00c6ff;
+    border-radius: 10px;
+}
+button, .clear-btn, .history-btn {
+    padding: 12px 25px;
+    margin: 10px;
+
+    border-radius: 12px;
+    border: none;
+
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+
+    background: linear-gradient(135deg, #ff512f, #dd2476);
+    cursor: pointer;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+button:hover, .clear-btn:hover, .history-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.title {
+    text-align: center;
+    font-size: 40px;
+    color: white;
+    letter-spacing: 2px;
+
+    text-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+.sudoku-grid {
+    animation: fadeUp 0.6s ease;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* Default cell */
+.cell {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+
+    border-radius: 12px;
+    border: none;
+
+    background: rgba(255,255,255,0.9);
+    color: #1e3c72;
+
+    transition: all 0.3s ease;
+}
+
+/* Hovered cell */
+.cell:hover {
+    transform: scale(1.2);
+    background: #ffcc00;
+    color: black;
+    z-index: 2;
+}
+
+/* SAME NUMBER HIGHLIGHT */
+.cell[data-num="1"]:hover ~ .cell[data-num="1"],
+.cell[data-num="2"]:hover ~ .cell[data-num="2"],
+.cell[data-num="3"]:hover ~ .cell[data-num="3"],
+.cell[data-num="4"]:hover ~ .cell[data-num="4"],
+.cell[data-num="5"]:hover ~ .cell[data-num="5"],
+.cell[data-num="6"]:hover ~ .cell[data-num="6"],
+.cell[data-num="7"]:hover ~ .cell[data-num="7"],
+.cell[data-num="8"]:hover ~ .cell[data-num="8"],
+.cell[data-num="9"]:hover ~ .cell[data-num="9"] {
+    background: #00f2fe;
+    color: white;
+    box-shadow: 0 0 15px #00f2fe;
+}
+/* Glow animation */
+@keyframes glow {
+    0% { box-shadow: 0 0 5px #00f2fe; }
+    50% { box-shadow: 0 0 20px #00f2fe; }
+    100% { box-shadow: 0 0 5px #00f2fe; }
+}
+
+.cell:hover {
+    animation: glow 1s infinite;
+}
+.timer {
+    text-align: center;
+    font-size: 20px;
+    color: white;
+    margin: 10px;
+}
+button {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #00f2fe, #4facfe);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.1);
+}
+.error {
+    color: red;
+    text-align: center;
+}
+
+.success {
+    color: green;
+    text-align: center;
+}
+/* ===== LOGO ===== */
+.logo-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.logo {
+    width: 100px;
+    height: auto;
+
+    filter: drop-shadow(0 0 10px #00e5ff);
+
+    animation: logoGlow 2s infinite alternate, floatLogo 3s ease-in-out infinite;
+}
+
+/* Glow animation */
+@keyframes logoGlow {
+    from {
+        filter: drop-shadow(0 0 10px #00e5ff);
+    }
+    to {
+        filter: drop-shadow(0 0 25px #00e5ff);
+    }
+}
+
+/* Floating effect */
+@keyframes floatLogo {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+/* Logo + Title alignment */
+.logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Logo image */
+.app-logo {
+    width: 60px;
+    height: 60px;
+
+    filter: drop-shadow(0 0 10px #00e5ff);
+
+    animation: logoSpin 6s linear infinite, glow 2s infinite alternate;
+}
+
+/* Glow effect */
+@keyframes glow {
+    from { filter: drop-shadow(0 0 10px #00e5ff); }
+    to { filter: drop-shadow(0 0 25px #00e5ff); }
+}
+
+/* Slow rotation */
+@keyframes logoSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+h1 {
+    font-size: 50px;
+    color: #e6f7ff;
+
+    text-shadow:
+        0 0 10px #00f7ff,
+        0 0 20px #00ffff,
+        0 0 40px #00e1ff;
+}
+.app-logo {
+    width: 40px;   /* reduce size */
+    height: 40px;
+
+    object-fit: contain;  /* keeps ratio */
+
+    filter: drop-shadow(0 0 10px #00e5ff);
+
+    animation: glow 2s infinite alternate;
+}
+.logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;  /* reduce gap */
+}
+/* ===== MOVING GLOW BACKGROUND ===== */
+body::before {
+    content: "";
+    position: fixed;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0,200,255,0.08) 2px, transparent 2px);
+    background-size: 60px 60px;
+    animation: moveBg 40s linear infinite;
+    z-index: -1;
+}
+
+@keyframes moveBg {
+    from { transform: translate(0, 0); }
+    to { transform: translate(300px, 300px); }
+}
+/* ===== DARK & SOFT GLOW GRID ===== */
+
+.cell {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Vertical 3x3 lines */
+.cell:nth-child(3n) {
+    border-right: 3px solid #1a1a2e;   /* dark blue-black */
+    box-shadow: 1px 0 6px rgba(0, 200, 255, 0.2); /* soft glow */
+}
+
+/* Horizontal 3x3 lines */
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) {
+    border-bottom: 3px solid #1a1a2e;
+    box-shadow: 0 1px 6px rgba(0, 200, 255, 0.2);
+}
+
+/* Outer border */
+.sudoku-grid {
+    border: 3px solid #1a1a2e;
+    box-shadow: 0 0 10px rgba(0, 200, 255, 0.25);
+}
+/* =========================
+   LIGHT GLOW BACKGROUND
+   ========================= */
+
+body {
+    background: linear-gradient(135deg, #f0f9ff, #e0f7fa, #f8fafc);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* floating glowing circles */
+body::before {
+    content: "";
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    top: 50px;
+    left: 50px;
+    background: radial-gradient(circle, rgba(0,200,255,0.4), transparent 70%);
+    filter: blur(80px);
+    z-index: -1;
+    animation: float1 6s ease-in-out infinite alternate;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    width: 250px;
+    height: 250px;
+    bottom: 50px;
+    right: 50px;
+    background: radial-gradient(circle, rgba(0,255,170,0.4), transparent 70%);
+    filter: blur(90px);
+    z-index: -1;
+    animation: float2 8s ease-in-out infinite alternate;
+}
+
+/* animation */
+@keyframes float1 {
+    0% { transform: translate(0,0); }
+    100% { transform: translate(40px, 30px); }
+}
+
+@keyframes float2 {
+    0% { transform: translate(0,0); }
+    100% { transform: translate(-30px, -40px); }
+}
+
+/* =========================
+   GRID GLOW
+   ========================= */
+
+.sudoku-grid {
+    box-shadow:
+        0 0 15px rgba(0,200,255,0.4),
+        0 0 30px rgba(0,200,255,0.2);
+    border-radius: 10px;
+}
+
+/* 3x3 lines glow */
+.cell:nth-child(3n) {
+    border-right: 3px solid #00c8ff;
+    box-shadow: 2px 0 10px rgba(0,200,255,0.5);
+}
+
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) {
+    border-bottom: 3px solid #00c8ff;
+    box-shadow: 0 2px 10px rgba(0,200,255,0.5);
+}
+
+/* =========================
+   CELL GLOW EFFECT
+   ========================= */
+
+.cell {
+    transition: all 0.2s ease;
+}
+
+/* hover glow */
+.cell:hover {
+    background: rgba(0,200,255,0.2);
+    box-shadow:
+        inset 0 0 10px rgba(0,200,255,0.5),
+        0 0 8px rgba(0,200,255,0.4);
+    transform: scale(1.05);
+}
+
+/* focus glow */
+.cell:focus {
+    outline: none;
+    background: rgba(0,255,170,0.2);
+    box-shadow:
+        0 0 12px rgba(0,255,170,0.6),
+        inset 0 0 10px rgba(0,255,170,0.4);
+}
+
+/* =========================
+   BUTTON GLOW
+   ========================= */
+
+button {
+    transition: all 0.3s ease;
+}
+
+/* hover glow */
+button:hover {
+    box-shadow:
+        0 0 10px rgba(0,200,255,0.5),
+        0 0 20px rgba(0,200,255,0.3);
+    transform: scale(1.05);
+}
+
+/* =========================
+   TITLE GLOW
+   ========================= */
+
+h1, h2 {
+    text-shadow:
+        0 0 10px rgba(0,200,255,0.4),
+        0 0 20px rgba(0,200,255,0.2);
+}
+body::after {
+    pointer-events: none;
+}
+/* =========================
+   EXTRA ATTRACTIVE EFFECTS
+   ========================= */
+
+/* glass glow for main box */
+.box {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.35),
+        0 0 25px rgba(34, 197, 94, 0.08),
+        0 0 45px rgba(59, 130, 246, 0.08);
+}
+
+/* more attractive title */
+h1,
+.typing {
+    letter-spacing: 1px;
+    text-shadow:
+        0 0 12px rgba(34, 197, 94, 0.7),
+        0 0 28px rgba(34, 197, 94, 0.35),
+        0 0 40px rgba(59, 130, 246, 0.18);
+}
+
+/* better inputs */
+input,
+.input-group input {
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.02),
+        0 8px 20px rgba(0,0,0,0.22);
+    transition: all 0.3s ease;
+}
+
+input:hover,
+.input-group input:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 0 12px rgba(59,130,246,0.15),
+        0 10px 22px rgba(0,0,0,0.24);
+}
+
+input:focus,
+.input-group input:focus {
+    border-color: #22c55e;
+    box-shadow:
+        0 0 0 3px rgba(34,197,94,0.12),
+        0 0 18px rgba(34,197,94,0.30),
+        0 10px 24px rgba(0,0,0,0.28);
+}
+
+/* attractive buttons */
+button,
+.solve-btn,
+.back-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+button::before,
+.solve-btn::before,
+.back-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 70%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.25),
+        transparent
+    );
+    transform: skewX(-25deg);
+    transition: 0.6s;
+}
+
+button:hover::before,
+.solve-btn:hover::before,
+.back-btn:hover::before {
+    left: 130%;
+}
+
+/* glowing graph panel */
+.graph-container {
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.02);
+    box-shadow:
+        inset 0 0 20px rgba(255,255,255,0.02),
+        0 0 20px rgba(59,130,246,0.08);
+}
+
+/* node upgrade */
+.node {
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow:
+        0 10px 22px rgba(0,0,0,0.25),
+        0 0 14px rgba(255,255,255,0.10);
+    transition: all 0.3s ease;
+}
+
+.node:hover {
+    transform: translateY(-6px) scale(1.12);
+    box-shadow:
+        0 0 18px rgba(255,255,255,0.35),
+        0 0 30px rgba(59,130,246,0.25),
+        0 12px 24px rgba(0,0,0,0.30);
+}
+
+/* stronger connecting line */
+.node:not(:last-child)::after {
+    height: 5px;
+    border-radius: 999px;
+    box-shadow: 0 0 14px rgba(59,130,246,0.45);
+}
+
+/* soft page glow */
+body::before {
+    opacity: 0.9;
+}
+
+body::after {
+    opacity: 0.85;
+}
+
+/* floating animation for box */
+.box {
+    animation: floatBox 4s ease-in-out infinite;
+}
+
+@keyframes floatBox {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-6px); }
+    100% { transform: translateY(0); }
+}
+
+/* soft fade-in */
+.box,
+.graph-container,
+.form-container {
+    animation: fadeRise 0.8s ease;
+}
+
+@keyframes fadeRise {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* =========================
+   VISITED NODE EFFECT
+   ========================= */
+
+/* visited class */
+.node.visited {
+    background: linear-gradient(135deg, #111827, #020617); /* dark */
+    color: #e5e7eb; /* light text */
+
+    border: 2px solid #22c55e;
+
+    box-shadow:
+        0 0 15px rgba(34,197,94,0.6),
+        inset 0 0 10px rgba(0,0,0,0.6);
+
+    transform: scale(1.05);
+}
+
+/* optional: stronger effect */
+.node.visited::after {
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+}

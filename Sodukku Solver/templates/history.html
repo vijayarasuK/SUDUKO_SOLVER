@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<h1 class="title">📜 History</h1>
+
+<a href="/" class="clear-btn">⬅ Back</a>
+
+{% for board in history %}
+    <div class="sudoku-grid">
+        {% for row in board %}
+            {% for cell in row %}
+                <input class="cell" value="{{ cell }}" readonly>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endfor %}
+
+{% if not history %}
+<p>No history available</p>
+{% endif %}
+
+</body>
+</html>
